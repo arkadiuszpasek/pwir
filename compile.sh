@@ -1,0 +1,1 @@
+erlc -v -o out/ src/*.erl src/*/* 
