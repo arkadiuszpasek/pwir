@@ -6,8 +6,8 @@ internal_increase(State, Amount) ->
   #{power := Power} = State,
   NewPower = Power + Amount,
 
-  io:format("Heater ~p increasing power by ~p ~n", [self(), Amount]),
-  io:format("Heater ~p current power: ~p ~n", [self(), NewPower]),
+  io:format("[Heater: ~p] increasing power by ~p ~n", [self(), Amount]),
+  io:format("[Heater: ~p] current power: ~p ~n", [self(), NewPower]),
   maps:merge(State, #{power => NewPower}).
 
 internal_decrease(State, Amount) ->
@@ -19,8 +19,8 @@ internal_decrease(State, Amount) ->
       TurnedOffState = turn_off(State),
       maps:merge(TurnedOffState, #{power => 0});
     true ->
-    io:format("Heater ~p decreasing power by ~p ~n", [self(), Amount]),
-    io:format("Heater ~p current power: ~p ~n", [self(), NewPower]),
+    io:format("[Heater: ~p] decreasing power by ~p ~n", [self(), Amount]),
+    io:format("[Heater: ~p] current power: ~p ~n", [self(), NewPower]),
     maps:merge(State, #{power => NewPower})
   end.
 
@@ -69,9 +69,10 @@ process(Unit, State) ->
       Updated = turn_off(State),
       process(Unit, Updated);
     _ ->
-      io:format("Unkown event on heater: ~p ~n", [self()]),
+      io:format("[Heater] Unkown event: ~p ~n", [self()]),
       process(Unit, State)
   end.
 
 start(Unit, State) ->
+  io:format("[Heater] starting.. ~n"),
   spawn(heater, process, [Unit, State]).

@@ -15,7 +15,9 @@ unit(Server, State, Heater) ->
       unit(Server, State, Heater);
     {action, off} ->
       Heater ! {action, off},
-      unit(Server, State, Heater)
+      unit(Server, State, Heater);
+    {data, temperature, Temperature} ->
+      io:format("[Temperature controller] Received temperature measure: ~p ~n", [Temperature])
   end.
 
 
@@ -26,6 +28,8 @@ start(Server) ->
       power => 0  
     }
   },
+
+  io:format("[Temperature controller] starting.. ~n"),
 
   Heater = heater:start(self(), maps:get(heater, InitialState)),
   spawn(temperature_controller, unit, [Server, InitialState, Heater]).
