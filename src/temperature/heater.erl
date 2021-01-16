@@ -30,7 +30,6 @@ turn_on(State) ->
   io:format("[Heater: ~p] turned on ~n", [self()]),
   maps:merge(State, #{state => on}).
 
-
 increase(State, Amount) -> 
   #{state := MyState} = State,
   if 
@@ -70,8 +69,8 @@ process(Unit, State) ->
       Updated = turn_off(State),
       Unit ! protocol:heater_data(Updated),
       process(Unit, Updated);
-    _ ->
-      io:format("[Heater] Unkown event: ~p ~n", [self()]),
+    E ->
+      io:format("[Heater: ~p] Unkown event: ~p ~n", [self(), E]),
       process(Unit, State)
   end.
 

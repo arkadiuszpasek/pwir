@@ -42,7 +42,11 @@ unit(Server, State, Heater, Probe) ->
     {data, temperature, Temperature} ->
       io:format("[Temperature controller] Received temperature measure: ~p ~n", [Temperature]),
       process_temperature(Temperature, Heater),
-      unit(Server, State, Heater, Probe)
+      unit(Server, State, Heater, Probe);
+    {error, Reason} ->
+      Server ! {error, Reason};
+    E ->
+      io:format("[Temperature controller] Unkown event: ~p ~n", [E])
   end.
 
 start(Server) ->

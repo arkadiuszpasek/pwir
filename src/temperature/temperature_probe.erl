@@ -14,4 +14,4 @@ measure(Main) ->
 start(Main) ->
   io:format("[Temperature probe] starting.. ~n"),
 
-  measure(Main).
+  spawn(temperature_probe, measure, [Main]).
