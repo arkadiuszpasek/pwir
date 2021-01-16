@@ -1,28 +1,26 @@
 -module(aqua).
 
--export([main/1, listener/0]).
+-export([main/1, manager/1]).
 
-listener() ->
+manager(Main) ->
   receive
     % {heartbeat}
-    {data, Data} ->
-      io:format("[Aquarium] Received data: ~p ~n", [Data]);
-    {error, _Reason} ->
-      io:format("[Aquarium] Error occured, shutting down.. ~n")
+    {error, Reason} ->
+      io:format("[Aquarium] Error occured: ~p, shutting down.. ~n", [Reason]),
+      manager(Main)
 
   end.
 
 main(_) ->
-  MainListener = spawn(aqua, listener, []),
-  io:format("[Aquarium] starting ~p..~n", [MainListener]),
-  TempController = spawn(temperature_controller, start, [MainListener]),
+  Manager = spawn(aqua, manager, [self()]),
+  io:format("[Aquarium] started ~p..~n", [Manager]),
+
+  TempController = spawn(temperature_controller, start, [Manager]),
   io:format("[Aquarium] Started temperature controller ~p ~n", [TempController]),
-  % temperature_probe:start(self()),
-  Probe = spawn(temperature_probe, start, [MainListener]),
-  io:format("[Aquarium] Started probe ~p ~n", [Probe]),
-  % temperature_controller:start(self()),
+
   io:format("[Aquarium] Started all units~n"),
+
   receive
-    {end, Reason} ->
+    {finish, Reason} ->
       io:format("[Aquarium] end ~p ~n", [Reason])
   end.

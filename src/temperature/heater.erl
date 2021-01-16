@@ -6,8 +6,7 @@ internal_increase(State, Amount) ->
   #{power := Power} = State,
   NewPower = Power + Amount,
 
-  io:format("[Heater: ~p] increasing power by ~p ~n", [self(), Amount]),
-  io:format("[Heater: ~p] current power: ~p ~n", [self(), NewPower]),
+  io:format("[Heater: ~p] increasing power by ~p, current: ~p~n", [self(), Amount, NewPower]),
   maps:merge(State, #{power => NewPower}).
 
 internal_decrease(State, Amount) ->
@@ -19,17 +18,16 @@ internal_decrease(State, Amount) ->
       TurnedOffState = turn_off(State),
       maps:merge(TurnedOffState, #{power => 0});
     true ->
-    io:format("[Heater: ~p] decreasing power by ~p ~n", [self(), Amount]),
-    io:format("[Heater: ~p] current power: ~p ~n", [self(), NewPower]),
+    io:format("[Heater: ~p] decreasing power by ~p, current: ~p~n", [self(), Amount, NewPower]),
     maps:merge(State, #{power => NewPower})
   end.
 
 turn_off(State) ->
-  io:format("Heater ~p turned off ~n", [self()]),
+  io:format("[Heater: ~p] turned off ~n", [self()]),
   maps:merge(State, #{state => off}).
 
 turn_on(State) ->
-  io:format("Heater ~p turned on ~n", [self()]),
+  io:format("[Heater: ~p] turned on ~n", [self()]),
   maps:merge(State, #{state => on}).
 
 
@@ -56,17 +54,21 @@ decrease(State, Amount) ->
 
 process(Unit, State) ->
   receive
-    {data, increase, Amount} ->
+    {action, increase, Amount} ->
       Updated = increase(State, Amount),
+      Unit ! protocol:heater_data(Updated),
       process(Unit, Updated);
-    {data, decrease, Amount} ->
+    {action, decrease, Amount} ->
       Updated = decrease(State, Amount),
+      Unit ! protocol:heater_data(Updated),
       process(Unit, Updated);
-    {data, on} ->
+    {action, on} ->
       Updated = turn_on(State),
+      Unit ! protocol:heater_data(Updated),
       process(Unit, Updated);
-    {data, off} ->
+    {action, off} ->
       Updated = turn_off(State),
+      Unit ! protocol:heater_data(Updated),
       process(Unit, Updated);
     _ ->
       io:format("[Heater] Unkown event: ~p ~n", [self()]),
