@@ -1,13 +1,9 @@
-# pwir
+# PWiR Projekt akwarium erlang
 
-## compile
-```
-erlc \
-src/protocol.erl \
-src/panel.erl \
-src/light.erl \
-src/temperature/temperature_probe.erl \
-src/temperature/heater.erl \
-src/temperature/temperature_controller.erl \
-src/aqua.erl
-```
+#### Arkadiusz Pasek
+
+### Running
+Compile with `erlc`, running `./compile.sh`
+
+The above script builds erlang files, most simple way to run the app using `escript`:
+`escipt aqua.beam`
