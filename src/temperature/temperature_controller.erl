@@ -46,7 +46,8 @@ unit(Server, State, Heater, Probe) ->
     {error, Reason} ->
       Server ! {error, Reason};
     E ->
-      io:format("[Temperature controller] Unkown event: ~p ~n", [E])
+      io:format("[Temperature controller] Unkown event: ~p ~n", [E]),
+      unit(Server, State, Heater, Probe)
   end.
 
 start(Server) ->

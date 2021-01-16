@@ -22,6 +22,9 @@ manager(Main, TempController, Light, Panel) ->
       manager(Main, TempController, Light, Panel);
     {error, Reason} ->
       io:format("[Aquarium] Error occured: ~p, shutting down.. ~n", [Reason]),
+      manager(Main, TempController, Light, Panel);
+    E ->
+      io:format("[Aquarium] Unkown event: ~p ~n", [E]),
       manager(Main, TempController, Light, Panel)
   end.
 
